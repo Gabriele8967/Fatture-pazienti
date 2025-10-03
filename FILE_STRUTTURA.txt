@@ -1,0 +1,34 @@
+📁 Struttura del Progetto
+========================
+
+backend/
+├── server.js              # Server Express principale con API
+├── setup-oauth.js         # Script interattivo per ottenere l'Access Token
+├── refresh-token.js       # Script per rinnovare l'Access Token
+├── check-config.js        # Verifica la configurazione
+├── package.json           # Dipendenze e script npm
+└── .env                   # Configurazione (GIÀ CREATO con le tue credenziali)
+
+frontend/
+└── index.html            # Form per i pazienti (responsive e semplice)
+
+File di configurazione:
+├── .env.example          # Template per nuove installazioni
+├── .gitignore           # Protegge file sensibili da Git
+
+Documentazione:
+├── README.md            # Guida completa del progetto
+├── ISTRUZIONI_RAPIDE.md # Setup veloce (PARTI DA QUI!)
+└── FILE_STRUTTURA.txt   # Questo file
+
+openapi-fattureincloud-master/
+└── (Documentazione API Fatture in Cloud)
+
+=========================
+✅ File .env già configurato con:
+   - Client ID
+   - Client Secret  
+   - Company ID: 1467198
+
+⏭️  PROSSIMO PASSO:
+   Leggi ISTRUZIONI_RAPIDE.md e segui i passi!

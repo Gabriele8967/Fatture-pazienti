@@ -1,0 +1,16 @@
+{
+  "name": "fatturazione-pazienti",
+  "version": "1.0.0",
+  "description": "Sistema di fatturazione semi-automatica per pazienti",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev"
+  },
+  "keywords": ["fatture", "fattureincloud", "healthcare", "vercel"],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=14.x"
+  }
+}

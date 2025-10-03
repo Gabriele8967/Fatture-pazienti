@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Richiesta Fattura - Centro Medico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input::placeholder {
+            color: #aaa;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Richiesta Fattura</h1>
+        <p class="subtitle">Inserisci i tuoi dati per ricevere la fattura</p>
+
+        <div class="info-box">
+            <strong>Informazione:</strong> Compila tutti i campi con i tuoi dati. La fattura verrà generata automaticamente.
+        </div>
+
+        <form id="invoiceForm">
+            <div class="form-group">
+                <label for="firstName">Nome *</label>
+                <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Mario"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Cognome *</label>
+                <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Rossi"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="mario.rossi@email.it"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="codiceFiscale">Codice Fiscale *</label>
+                <input
+                    type="text"
+                    id="codiceFiscale"
+                    name="codiceFiscale"
+                    placeholder="RSSMRA80A01H501U"
+                    maxlength="16"
+                    style="text-transform: uppercase"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="causale">Causale / Descrizione Prestazione *</label>
+                <input
+                    type="text"
+                    id="causale"
+                    name="causale"
+                    placeholder="Es: Visita medica, Consulenza, Prestazione sanitaria..."
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="prezzo">Prezzo (€) *</label>
+                <input
+                    type="number"
+                    id="prezzo"
+                    name="prezzo"
+                    placeholder="50.00"
+                    step="0.01"
+                    min="0.01"
+                    required
+                >
+            </div>
+
+            <button type="submit" id="submitBtn">
+                Genera Fattura
+            </button>
+
+            <div class="loading" id="loading" style="display: none;">
+                Creazione fattura in corso...
+            </div>
+        </form>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('invoiceForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const message = document.getElementById('message');
+        const loading = document.getElementById('loading');
+
+        // Configura l'URL del backend
+        // In produzione su Vercel, usa URL relativo (stesso dominio)
+        // In locale, usa localhost
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/api/create-invoice'
+            : '/api/create-invoice';
+
+        // Validazione codice fiscale
+        function validateCodiceFiscale(cf) {
+            const regex = /^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/i;
+            return regex.test(cf);
+        }
+
+        // Mostra messaggio
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type} show`;
+
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 5000);
+        }
+
+        // Auto-uppercase per codice fiscale
+        document.getElementById('codiceFiscale').addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        // Submit form
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                codiceFiscale: document.getElementById('codiceFiscale').value.trim().toUpperCase(),
+                causale: document.getElementById('causale').value.trim(),
+                prezzo: parseFloat(document.getElementById('prezzo').value)
+            };
+
+            // Validazione client-side
+            if (!validateCodiceFiscale(formData.codiceFiscale)) {
+                showMessage('Il codice fiscale non è valido', 'error');
+                return;
+            }
+
+            if (!formData.causale || formData.causale.length < 3) {
+                showMessage('La causale deve contenere almeno 3 caratteri', 'error');
+                return;
+            }
+
+            if (!formData.prezzo || formData.prezzo <= 0) {
+                showMessage('Il prezzo deve essere maggiore di zero', 'error');
+                return;
+            }
+
+            // Disabilita form durante invio
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            message.classList.remove('show');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`Fattura creata con successo! Numero: ${data.invoice.number}`, 'success');
+                    form.reset();
+                } else {
+                    showMessage(data.message || 'Errore nella creazione della fattura', 'error');
+                }
+            } catch (error) {
+                console.error('Errore:', error);
+                showMessage('Errore di connessione al server. Riprova più tardi.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

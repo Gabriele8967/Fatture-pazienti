@@ -1,0 +1,13 @@
+node_modules
+.env
+*.log
+.DS_Store
+openapi-fattureincloud-master
+.claude
+backend/setup-oauth.js
+backend/setup-oauth-debug.js
+backend/refresh-token.js
+backend/check-*.js
+backend/get-vat-types.js
+*.md
+!README.md
