@@ -43,13 +43,48 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server attivo' });
 });
 
+// Endpoint per recuperare i metodi di pagamento disponibili
+app.get('/api/payment-methods', async (req, res) => {
+  try {
+    if (!FIC_ACCESS_TOKEN || !FIC_COMPANY_ID) {
+      return res.status(500).json({
+        success: false,
+        message: 'Configurazione server non completa'
+      });
+    }
+
+    const response = await axios.get(
+      `${FIC_API_URL}/c/${FIC_COMPANY_ID}/info/payment_methods`,
+      {
+        headers: {
+          'Authorization': `Bearer ${FIC_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    res.json({
+      success: true,
+      paymentMethods: response.data.data
+    });
+
+  } catch (error) {
+    console.error('Errore nel recupero metodi di pagamento:', error.response?.data || error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Errore nel recupero dei metodi di pagamento',
+      error: error.response?.data?.error?.message || error.message
+    });
+  }
+});
+
 // Endpoint per creare la fattura
 app.post('/api/create-invoice', async (req, res) => {
   try {
-    const { firstName, lastName, email, codiceFiscale, causale, prezzo } = req.body;
+    const { firstName, lastName, email, codiceFiscale, causale, prezzo, metodoPagamentoId } = req.body;
 
     // Validazione input
-    if (!firstName || !lastName || !email || !codiceFiscale || !causale || !prezzo) {
+    if (!firstName || !lastName || !email || !codiceFiscale || !causale || !prezzo || !metodoPagamentoId) {
       return res.status(400).json({
         success: false,
         message: 'Tutti i campi sono obbligatori'
@@ -149,8 +184,9 @@ app.post('/api/create-invoice', async (req, res) => {
           }
         ],
         payment_method: {
-          name: process.env.PAYMENT_METHOD || 'Contanti'
-        }
+          id: parseInt(metodoPagamentoId)
+        },
+        show_payment_method: true
       }
     };
 

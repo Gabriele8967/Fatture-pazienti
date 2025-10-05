@@ -56,16 +56,17 @@
             font-size: 14px;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 16px;
             transition: all 0.3s ease;
+            background: white;
         }
 
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -73,6 +74,10 @@
 
         input::placeholder {
             color: #aaa;
+        }
+
+        select {
+            cursor: pointer;
         }
 
         button {
@@ -235,6 +240,17 @@
                 >
             </div>
 
+            <div class="form-group">
+                <label for="metodoPagamento">Metodo di Pagamento *</label>
+                <select
+                    id="metodoPagamento"
+                    name="metodoPagamento"
+                    required
+                >
+                    <option value="">Caricamento...</option>
+                </select>
+            </div>
+
             <button type="submit" id="submitBtn">
                 Genera Fattura
             </button>
@@ -252,13 +268,16 @@
         const submitBtn = document.getElementById('submitBtn');
         const message = document.getElementById('message');
         const loading = document.getElementById('loading');
+        const metodoPagamentoSelect = document.getElementById('metodoPagamento');
 
         // Configura l'URL del backend
         // In produzione su Vercel, usa URL relativo (stesso dominio)
         // In locale, usa localhost
-        const API_URL = window.location.hostname === 'localhost'
-            ? 'http://localhost:3000/api/create-invoice'
-            : '/api/create-invoice';
+        const BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000'
+            : '';
+        const API_URL = `${BASE_URL}/api/create-invoice`;
+        const PAYMENT_METHODS_URL = `${BASE_URL}/api/payment-methods`;
 
         // Validazione codice fiscale
         function validateCodiceFiscale(cf) {
@@ -276,6 +295,34 @@
             }, 5000);
         }
 
+        // Carica i metodi di pagamento all'avvio
+        async function loadPaymentMethods() {
+            try {
+                const response = await fetch(PAYMENT_METHODS_URL);
+                const data = await response.json();
+
+                if (data.success && data.paymentMethods) {
+                    metodoPagamentoSelect.innerHTML = '<option value="">-- Seleziona metodo --</option>';
+
+                    data.paymentMethods.forEach(method => {
+                        const option = document.createElement('option');
+                        option.value = method.id;
+                        option.textContent = method.name;
+                        metodoPagamentoSelect.appendChild(option);
+                    });
+                } else {
+                    metodoPagamentoSelect.innerHTML = '<option value="">Errore nel caricamento</option>';
+                    showMessage('Impossibile caricare i metodi di pagamento', 'error');
+                }
+            } catch (error) {
+                console.error('Errore caricamento metodi pagamento:', error);
+                metodoPagamentoSelect.innerHTML = '<option value="">Errore nel caricamento</option>';
+            }
+        }
+
+        // Carica i metodi di pagamento all'avvio della pagina
+        loadPaymentMethods();
+
         // Auto-uppercase per codice fiscale
         document.getElementById('codiceFiscale').addEventListener('input', (e) => {
             e.target.value = e.target.value.toUpperCase();
@@ -291,7 +338,8 @@
                 email: document.getElementById('email').value.trim(),
                 codiceFiscale: document.getElementById('codiceFiscale').value.trim().toUpperCase(),
                 causale: document.getElementById('causale').value.trim(),
-                prezzo: parseFloat(document.getElementById('prezzo').value)
+                prezzo: parseFloat(document.getElementById('prezzo').value),
+                metodoPagamentoId: document.getElementById('metodoPagamento').value
             };
 
             // Validazione client-side
@@ -307,6 +355,11 @@
 
             if (!formData.prezzo || formData.prezzo <= 0) {
                 showMessage('Il prezzo deve essere maggiore di zero', 'error');
+                return;
+            }
+
+            if (!formData.metodoPagamentoId) {
+                showMessage('Seleziona un metodo di pagamento', 'error');
                 return;
             }
 
