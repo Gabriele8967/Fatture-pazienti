@@ -210,7 +210,9 @@ app.post('/api/create-invoice', async (req, res) => {
     try {
       const emailData = {
         data: {
-          recipient_email: email,
+          sender_id: 0,  // ID del sender email predefinito
+          sender_email: 'centrimanna2@gmail.com',  // Email del sender
+          recipient_email: email,  // Email del paziente che ha compilato il form
           subject: `Fattura nr. ${invoiceNumber}`,
           body: `Gentile ${firstName} ${lastName},<br><br>In allegato troverà la fattura nr. ${invoiceNumber}.<br><br>Cordiali saluti`,
           include: {
