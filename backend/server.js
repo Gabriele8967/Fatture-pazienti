@@ -203,13 +203,51 @@ app.post('/api/create-invoice', async (req, res) => {
       }
     );
 
+    const invoiceId = response.data.data.id;
+    const invoiceNumber = response.data.data.number;
+
+    // Invia automaticamente la fattura via email al paziente
+    try {
+      const emailData = {
+        data: {
+          recipient_email: email,
+          subject: `Fattura nr. ${invoiceNumber}`,
+          body: `Gentile ${firstName} ${lastName},<br><br>In allegato troverà la fattura nr. ${invoiceNumber}.<br><br>Cordiali saluti`,
+          include: {
+            document: true,
+            delivery_note: false,
+            attachment: false,
+            accompanying_invoice: false
+          },
+          attach_pdf: true,
+          send_copy: false
+        }
+      };
+
+      await axios.post(
+        `${FIC_API_URL}/c/${FIC_COMPANY_ID}/issued_documents/${invoiceId}/email`,
+        emailData,
+        {
+          headers: {
+            'Authorization': `Bearer ${FIC_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log(`Email inviata con successo a ${email} per fattura ${invoiceNumber}`);
+    } catch (emailError) {
+      // Log dell'errore ma non bloccare la risposta - la fattura è stata creata comunque
+      console.error('Errore nell\'invio dell\'email:', emailError.response?.data || emailError.message);
+    }
+
     // Risposta di successo
     res.json({
       success: true,
-      message: 'Fattura creata con successo',
+      message: 'Fattura creata con successo e inviata via email',
       invoice: {
-        id: response.data.data.id,
-        number: response.data.data.number,
+        id: invoiceId,
+        number: invoiceNumber,
         date: response.data.data.date,
         amount: grossAmount.toFixed(2)
       }
