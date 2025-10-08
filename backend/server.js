@@ -100,7 +100,7 @@ app.post('/api/create-invoice', async (req, res) => {
         const { 
     firstName, lastName, email, codiceFiscale, indirizzo, cap, citta, provincia, 
     telefono, dataNascita, luogoNascita, professione, numeroDocumento, scadenzaDocumento, 
-    emailComunicazioni, note, causale, prezzo, metodoPagamentoId 
+    emailComunicazioni, causale, prezzo, metodoPagamentoId 
 } = req.body;
 
     // Validazione input
@@ -215,7 +215,7 @@ app.post('/api/create-invoice', async (req, res) => {
           birth_place: luogoNascita,
           job_title: professione,
           // Note aggiuntive nel campo notes
-          notes: `Documento: ${numeroDocumento || 'N/A'}, Scadenza: ${scadenzaDocumento || 'N/A'}${note ? ', Note: ' + note : ''}
+          notes: `Documento: ${numeroDocumento || 'N/A'}, Scadenza: ${scadenzaDocumento || 'N/A'}
 
 ${bolloText}`
         },
