@@ -181,7 +181,11 @@ app.post('/api/create-invoice', async (req, res) => {
           {
             amount: grossAmount,
             due_date: new Date().toISOString().split('T')[0],
-            status: 'not_paid'
+            paid_date: new Date().toISOString().split('T')[0],
+            status: 'paid',
+            payment_account: {
+              id: 1415813  // Account "altro" per fatture saldate
+            }
           }
         ],
         payment_method: {

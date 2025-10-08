@@ -1,0 +1,1225 @@
+In this guide, we will explain how to create an invoice. We choose this type of document because it is the most common, but keep in mind that the process is almost the same for every issued document.
+
+The available types are:
+
+    invoice: an invoice (we will use this type in this guide)
+    quote: a quote
+    proforma: a pro forma invoice
+    receipt: a tax receipt
+    delivery_note: a delivery note
+    credit_note: a credit note
+    order: an order
+    work_report: a work report
+    supplier_order: an order by the supplier
+    self_own_invoice: a self-invoice in which the issuer of the document appears both as the customer and as the supplier
+    self_supplier_invoice: a self-invoice in which the issuer of the document appears as the customer, while the other company acts as the supplier
+
+1️⃣  Step One: The Customer
+
+To create an invoice, we need the customer's details. You have three options:
+
+    If the customer's details were already inserted in Fatture in Cloud, you can retrieve it using our API and add it to the request. See also: Get the list of existing clients
+
+    If the client wasn't inserted in Fatture in Cloud, but it will likely be a recurring customer (so you would like to store his details), you can insert it now, and use the returned details to populate the request. See also: Client creation and the Create Client API
+
+    If the customer is most likely a one-time customer, you can just insert his details directly in the invoice.
+
+The Client's data must be inserted in the entity field, as shown below. If you used the Clients API to store/retrieve the details, please remember to insert the entity.id field to link the invoice accordingly.
+It can be easier!
+
+Our new Utilities tool also makes possible to export the current list of clients, so you could use it to jumpstart your invoice creation process!
+We don't autocomplete!
+
+If you choose to link an existing customer (or to create a new one) make sure you set all the fields you want to be shown in your invoice: at this moment we don't autocomplete your invoice with the customer details, even if he's already stored in Fatture in Cloud.
+
+You can get the info about your client performing a Get Client request.
+
+The partial request looks like this:
+
+// NOTE: this is a partial request, please wait before sending it
+{
+  "data": {
+    "type": "invoice",
+    "entity": {
+      "id": 1, // only if the client already exists
+      "name": "Mario Rossi",
+      "vat_number": "47803200154",
+      "tax_code": "RSSMRA91M20B967Q",
+      "address_street": "Via Italia, 66",
+      "address_postal_code": "20900",
+      "address_city": "Milano",
+      "address_province": "MI",
+      "address_extra": "",
+      "country": "Italia"
+    }
+  }
+}
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+// NOTE: this is a partial request, please wait before sending it
+// in this example we are using our C# SDK https://www.nuget.org/packages/It.FattureInCloud.Sdk/
+
+// If you want to use our Client API:
+// Retrieve a client: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/ClientsApi.md#listclients
+// Create a new client: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/ClientsApi.md#createclient
+// Insertion on-the-fly:
+Entity entity = new Entity(
+    id: 1, // Only if the client already exists
+    name: "Mario Rossi",
+    vatNumber: "47803200154",
+    taxCode: "RSSMRA91M20B967Q",
+    addressStreet: "Via Italia, 66",
+    addressPostalCode: "20900",
+    addressCity: "Milano",
+    addressProvince: "MI",
+    country: "Italia"
+);
+
+IssuedDocument invoice = new IssuedDocument(
+    type: IssuedDocumentType.Invoice,
+    entity: entity
+);
+
+2️⃣  Step Two: The Invoice Data
+
+This section allows the insertion of your invoice's basic data, below you can find the main fields:
+
+    date: the date of issue.
+
+    number: the progressive invoice number, if omitted it gets automatically set ('numero documento', eg. 107).
+
+    numeration: optional invoice numeration ('sezionale documento', eg. "/FPA").
+
+    visible_subject: short optional invoice description (visible in the invoice PDF).
+
+    subject: short optional invoice description (not visible in the invoice PDF).
+
+    language: the document language, see: List Languages
+
+    currency: the currency used for the invoice payment, see: List Currencies
+
+    rc_center: optional field that represents the category of the generated revenue (centro di ricavo).
+
+The partial request looks like this:
+
+// NOTE: this is a partial request, please wait before sending it
+{
+  "data": {
+    "type": "invoice",
+    "entity": {
+      "id": 1,
+      "name": "Mario Rossi",
+      "vat_number": "47803200154",
+      "tax_code": "RSSMRA91M20B967Q",
+      "address_street": "Via Italia, 66",
+      "address_postal_code": "20900",
+      "address_city": "Milano",
+      "address_province": "MI",
+      "address_extra": "",
+      "country": "Italia"
+    },
+    "date": "2022-01-20",
+    "number": 1,
+    "numeration": "/fatt",
+    "subject": "internal subject",
+    "visible_subject": "visible subject",
+    "currency": {
+      "id": "EUR",
+      "exchange_rate": "1.00000",
+      "symbol": "€"
+    },
+    "language": {
+      "code": "it",
+      "name": "Italiano"
+    }
+  }
+}
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+// NOTE: this is a partial request, please wait before sending it
+
+// in this example we are using our C# SDK
+// https://www.nuget.org/packages/It.FattureInCloud.Sdk/
+
+Entity entity = new Entity(
+    id: 1,
+    name: "Mario Rossi",
+    vatNumber: "47803200154",
+    taxCode: "RSSMRA91M20B967Q",
+    addressStreet: "Via Italia, 66",
+    addressPostalCode: "20900",
+    addressCity: "Milano",
+    addressProvince: "MI",
+    country: "Italia"
+);
+
+IssuedDocument invoice = new IssuedDocument(
+    type: IssuedDocumentType.Invoice,
+    entity: entity,
+
+    // Below you can find this section fields:
+    date: new DateTime(2022, 01, 20),
+    number: 1,
+    numeration: "/fatt",
+    subject: "internal subject",
+    visibleSubject: "visible subject",
+    // Retrieve the currencies: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/InfoApi.md#listCurrencies
+    currency: new Currency(
+        id: "EUR"
+    ),
+    // Retrieve the languages: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/InfoApi.md#listLanguages
+    language: new Language(
+        code: "it",
+        name: "italiano"
+    )
+);
+
+3️⃣  Step Three: E-Invoice
+
+If you want to issue an electronic invoice the first thing to do is to set the e_invoice field to true, then the ei_data field needs to be set accordingly to your needs:
+
+    vat_kind: (esigibilità iva) can be one of the following:
+        I => immediata
+        D => differita
+        S => spit payment
+
+    payment_method: one of the accepted payment methods
+
+    bank_iban: automatically to your settings default payment method if it is set bank_name: optional bank name bank
+
+    bank_beneficiary: set your name if different from your business name
+
+    original_document_type: optional field for invoice issue reason, can be ordine, contratto, convenzione
+
+    od_number: reference to the original document
+
+    od_date: original document issue date
+
+    cig: codice identificativo della gara
+
+    cup: codice unico di progetto
+
+    invoice_number: if document type is credit note this field is the reference to the invoice to be reversed
+
+    invoice_date: if document type is credit note this field is the date of the invoice to be reversed
+
+There are also some fields to be set in the entity field:
+
+    e_invoice: must be set to true
+
+    ei_code: customer einvoice code
+
+    certified_email: optional customer pec
+
+If you have to set advanced parameters you have to use the ei_raw fields.
+
+The partial request looks like this:
+
+// NOTE: this is a partial request, please wait before sending it
+{
+  "data": {
+    "type": "invoice",
+    "entity": {
+      "id": 1,
+      "name": "Mario Rossi",
+      "vat_number": "47803200154",
+      "tax_code": "RSSMRA91M20B967Q",
+      "address_street": "Via Italia, 66",
+      "address_postal_code": "20900",
+      "address_city": "Milano",
+      "address_province": "MI",
+      "address_extra": "",
+      "country": "Italia"
+    },
+    "date": "2022-01-20",
+    "number": 1,
+    "numeration": "/fatt",
+    "subject": "internal subject",
+    "visible_subject": "visible subject",
+    "currency": {
+      "id": "EUR",
+      "exchange_rate": "1.00000",
+      "symbol": "€"
+    },
+    "language": {
+      "code": "it",
+      "name": "Italiano"
+    },
+    // Here we set e_invoice and ei_data
+    "e_invoice": true,
+    "ei_data": {
+      "payment_method": "MP05"
+    }
+  }
+}
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+// NOTE: this is a partial request, please wait before sending it
+// in this example we are using our C# SDK
+// https://www.nuget.org/packages/It.FattureInCloud.Sdk/
+
+Entity entity = new Entity(
+    id: 1,
+    name: "Mario Rossi",
+    vatNumber: "47803200154",
+    taxCode: "RSSMRA91M20B967Q",
+    addressStreet: "Via Italia, 66",
+    addressPostalCode: "20900",
+    addressCity: "Milano",
+    addressProvince: "MI",
+    country: "Italia"
+);
+
+IssuedDocument invoice = new IssuedDocument(
+    type: IssuedDocumentType.Invoice,
+    entity: entity,
+    date: new DateTime(2022, 01, 20),
+    number: 1,
+    numeration: "/fatt",
+    subject: "internal subject",
+    visibleSubject: "visible subject",
+    currency: new Currency(
+        id: "EUR"
+    ),
+    language: new Language(
+        code: "it",
+        name: "italiano"
+    ),
+    // Here we set e_invoice and ei_data
+    eInvoice: true,
+    eiData: new IssuedDocumentEiData(
+        paymentMethod:"MP05"
+    )
+);
+
+4️⃣  Step Four: Contributions and Withholdings
+
+The Contributions and withholdings section allows the insertion of Casse Professionali, Rivalsa, Withholding tax, and other Withholdings / Enasarco.
+
+    cassa professionisti: you can set up two Casse professionisti and set the fields according to your needs.
+
+    rivalsa (INPS): you can set up the Rivalsa and charge it to your clients setting the appropriate fields.
+
+    withholding tax: you can set up the Irpef withholding tax setting the appropriate fields.
+
+    enasarco and other withholdings: you will find also the fields to set up Enasarco and other Withholdings.
+
+5️⃣  Step Five: Items list
+
+The items composing the invoice are included in the Items List section.
+
+As already seen in step one, you have three possibilities to add items:
+
+    If you already inserted the Product in the Fatture in Cloud API, you can retrieve it using the Products API. See also: Get a list of the products
+
+    If this is a new product, and you want to add it to Fatture in Cloud, you can do it now. See also: Create a new product
+
+    If you don't want to save this product for future use, just insert it in the request.
+
+It can be easier!
+
+Our new Utilities tool also makes possible to export the current list of products, so you could use it to jumpstart your invoice creation process!
+
+The items_list is an array of items: Just remember to specify the id if you inserted a product using the Product API and want to link it to the invoice.
+
+If you are not familiar with the invoice item, you can find below the description of the fields:
+
+    code: optional, a custom code
+
+    name: product name
+
+    net_price/gross_price: price per single item, if you set the flag use_gross_prices to true you have to specify the gross_price
+
+    vat: the only field you have to set is the id, you can get the id of the vat you need by performing a list vat type call or create a vat type if the one you want does not exist yet.
+
+    discount: optional, discount percentage, automatically set if you specified the default discount in the relative client registry
+
+    category: useful to categorize your products
+
+    description: additional details
+
+    qty: number of products sold
+
+    measure: optional, unit of measure of the product (eg: kilograms, liters, days, etc...)
+
+    not_taxable: if this flag is set to true the amount will not be counted as revenue.
+
+    apply_withholding_tax: if you don't want withholding taxes, rivalsa, and cassa to be applied set this flag to false.
+
+If you want to add a 'bollo a carico del cliente' in a einvoice, you have to add a new item, set the name to 'Bollo in fattura', net_price to 2€, not_taxable to true and the vat.id field to 21 (0% Escluso Art.15), if the invoice is not electronic it's enough to set the field stamp_duty to the amount you want to charge, keep in mind that using the stamp_duty in a einvoice the 'bollo' will be charged to you, not to the customer.
+We don't autocomplete!
+
+If you choose to link an existing product (or to create a new one) make sure you set all the fields you want to be shown in your invoice: at this moment we don't autocomplete your invoice with the product details, even if it is already stored in Fatture in Cloud. You can get the info about your product performing a Get Product request.
+
+Now we add the items_list to our request:
+
+// NOTE: this is a partial request, please wait before sending it
+
+{
+    "data": {
+        "type": "invoice",
+        "entity": {
+            "id": 1,
+            "name": "Mario Rossi",
+            "vat_number": "47803200154",
+            "tax_code": "RSSMRA91M20B967Q",
+            "address_street": "Via Italia, 66",
+            "address_postal_code": "20900",
+            "address_city": "Milano",
+            "address_province": "MI",
+            "address_extra": "",
+            "country": "Italia"
+        },
+        "date": "2022-01-20",
+        "number": 1,
+        "numeration": "/fatt",
+        "subject": "internal subject",
+        "visible_subject": "visible subject",
+        "currency": {
+            "id": "EUR",
+            "exchange_rate": "1.00000",
+            "symbol": "€"
+        },
+        "language": {
+            "code": "it",
+            "name": "Italiano"
+        },
+        "items_list": [
+            {
+                "product_id": 4,
+                "code": "TV3",
+                "name": "Tavolo in legno",
+                "net_price": 100,
+                "category": "cucina",
+                "discount": 0,
+                "qty": 1,
+                "vat": {
+                    "id": 0 #22%
+                }
+            }
+        ]
+    }
+}
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+// NOTE: this is a partial request, please wait before sending it
+
+// in this example we are using our C# SDK
+// https://www.nuget.org/packages/It.FattureInCloud.Sdk/
+
+Entity entity = new Entity(
+    id: 1,
+    name: "Mario Rossi",
+    vatNumber: "47803200154",
+    taxCode: "RSSMRA91M20B967Q",
+    addressStreet: "Via Italia, 66",
+    addressPostalCode: "20900",
+    addressCity: "Milano",
+    addressProvince: "MI",
+    country: "Italia"
+);
+
+IssuedDocument invoice = new IssuedDocument(
+    type: IssuedDocumentType.Invoice,
+    entity: entity,
+    date: new DateTime(2022, 01, 20),
+    number: 1,
+    numeration: "/fatt",
+    subject: "internal subject",
+    visibleSubject: "visible subject",
+    currency: new Currency(
+        id: "EUR"
+    ),
+    language: new Language(
+        code: "it",
+        name: "italiano"
+    ),
+    // Here we set the Items List
+    // List your products: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/ProductsApi.md#listProducts
+    itemsList: new List < IssuedDocumentItemsListItem > {
+        new IssuedDocumentItemsListItem(
+            productId: 4,
+            code: "TV3",
+            name: "Tavolo in legno",
+            netPrice: 100,
+            category: "cucina",
+            discount: 0,
+            qty: 1,
+            vat: new VatType(
+                id: 0
+            )
+        )
+    }
+);
+
+6️⃣  Step Six: Payments List
+
+The Payment List section allows the insertion of all the info about your invoice payments.
+
+    amount: the amount of the payment.
+
+    payment_terms: the number of days by which the payment must be made can be set.
+
+    due_date: the date by which the payment must be made.
+
+    status: the payment status, can be not_paid, paid, and reversed.
+
+    payment_account: if the status of the invoice is paid, the payment account id needs to be set, make sure it exists or you will get an error. You can get a list of your payment accounts or create a new one as you need.
+
+It can be easier!
+
+Our new Utilities tool also makes possible to export the current list of payment accounts, so you could use it to jumpstart your invoice creation process!
+
+Here we suppose that the status is "paid", and we add the new parameters to the request:
+
+// NOTE: this is a partial request, please wait before sending it
+
+{
+  "data": {
+    "type": "invoice",
+    "entity": {
+      "id": 1,
+      "name": "Mario Rossi",
+      "vat_number": "47803200154",
+      "tax_code": "RSSMRA91M20B967Q",
+      "address_street": "Via Italia, 66",
+      "address_postal_code": "20900",
+      "address_city": "Milano",
+      "address_province": "MI",
+      "address_extra": "",
+      "country": "Italia"
+    },
+    "date": "2022-01-20",
+    "number": 1,
+    "numeration": "/fatt",
+    "subject": "internal subject",
+    "visible_subject": "visible subject",
+    "currency": {
+      "id": "EUR",
+      "exchange_rate": "1.00000",
+      "symbol": "€"
+    },
+    "language": {
+      "code": "it",
+      "name": "Italiano"
+    },
+    "items_list": [
+      {
+        "product_id": 4,
+        "code": "TV3",
+        "name": "Tavolo in legno",
+        "net_price": 100,
+        "category": "cucina",
+        "discount": 0,
+        "qty": 1,
+        "vat": {
+          "id": 0
+        }
+      }
+    ],
+    "payments_list": [
+      {
+        "amount": 122,
+        "due_date": "2022-01-23",
+        "paid_date": "2022-01-22",
+        "status": "paid",
+        "payment_account": {
+          "id": 110
+        }
+      }
+    ]
+  }
+}
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+// NOTE: this is a partial request, please wait before sending it
+
+// in this example we are using our C# SDK
+// https://www.nuget.org/packages/It.FattureInCloud.Sdk/
+
+Entity entity = new Entity(
+    id: 1,
+    name: "Mario Rossi",
+    vatNumber: "47803200154",
+    taxCode: "RSSMRA91M20B967Q",
+    addressStreet: "Via Italia, 66",
+    addressPostalCode: "20900",
+    addressCity: "Milano",
+    addressProvince: "MI",
+    country: "Italia"
+);
+
+IssuedDocument invoice = new IssuedDocument(
+    type: IssuedDocumentType.Invoice,
+    entity: entity,
+    date: new DateTime(2022, 01, 20),
+    number: 1,
+    numeration: "/fatt",
+    subject: "internal subject",
+    visibleSubject: "visible subject",
+    currency: new Currency(
+        id: "EUR"
+    ),
+    language: new Language(
+        code: "it",
+        name: "italiano"
+    ),
+    itemsList: new List < IssuedDocumentItemsListItem > {
+        new IssuedDocumentItemsListItem(
+            productId: 4,
+            code: "TV3",
+            name: "Tavolo in legno",
+            netPrice: 100,
+            category: "cucina",
+            discount: 0,
+            qty: 1,
+            vat: new VatType(
+                id: 0
+            )
+        )
+    },
+    // Here we set the payments list assuming our invoice has already been paid
+    paymentsList: new List < IssuedDocumentPaymentsListItem > {
+        new IssuedDocumentPaymentsListItem(
+            amount: 122,
+            dueDate: new DateTime(2022, 01, 23),
+            paidDate: new DateTime(2022, 01, 22),
+            status: IssuedDocumentStatus.Paid,
+            // List your payment accounts: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/InfoApi.md#listPaymentAccounts
+            paymentAccount: new PaymentAccount(
+                id: 110
+            )
+        )
+    }
+);
+
+If you want to know more about the calculation of the amounts you can visit the calculating totals page.
+7️⃣  Step Seven: Advanced Options
+
+The Advanced Options section allows the management of the payment methods and the direct generation of DDT and accompanying invoices.
+
+    payment_method: you can use this field to communicate to the customer how to pay the invoice; the only required parameter is the payment method id, make sure it exists or you will get an error. You can get a list of your payment methods or create a new one according to your needs.
+
+    show_payment_method: if this flag is set to true, it shows the payment method details in the invoice.
+
+    delivery_note: if this flag is set to true, you can set all the delivery note-related parameters and a DDT will be automatically created.
+
+    accompanying_invoice: if this flag is set to true, you can set all the accompanying invoice-related parameters and it will be automatically created.
+
+    amount_due_discount: with this parameter you can set a discount or surcharge on the total of the invoice.
+
+    use_split_payment: this flag can be set to true if the split payment is needed.
+
+It can be easier!
+
+Our new Utilities tool also makes possible to export the current list of payment methods, so you could use it to jumpstart your invoice creation process!
+
+Below we add the Payment Method to the request:
+
+// NOTE: this is a partial request, please wait before sending it
+
+{
+  "data": {
+    "type": "invoice",
+    "entity": {
+      "id": 1,
+      "name": "Mario Rossi",
+      "vat_number": "47803200154",
+      "tax_code": "RSSMRA91M20B967Q",
+      "address_street": "Via Italia, 66",
+      "address_postal_code": "20900",
+      "address_city": "Milano",
+      "address_province": "MI",
+      "address_extra": "",
+      "country": "Italia"
+    },
+    "date": "2022-01-20",
+    "number": 1,
+    "numeration": "/fatt",
+    "subject": "internal subject",
+    "visible_subject": "visible subject",
+    "currency": {
+      "id": "EUR",
+      "exchange_rate": "1.00000",
+      "symbol": "€"
+    },
+    "language": {
+      "code": "it",
+      "name": "Italiano"
+    },
+    "items_list": [
+      {
+        "product_id": 4,
+        "code": "TV3",
+        "name": "Tavolo in legno",
+        "net_price": 100,
+        "category": "cucina",
+        "discount": 0,
+        "qty": 1,
+        "vat": {
+          "id": 0
+        }
+      }
+    ],
+    "payments_list": [
+      {
+        "amount": 122,
+        "due_date": "2022-01-23",
+        "paid_date": "2022-01-22",
+        "status": "paid",
+        "payment_account": {
+          "id": 110
+        }
+      }
+    ],
+    "payment_method": {
+      "id": 386683
+    }
+  }
+}
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+Entity entity = new Entity(
+    id: 1,
+    name: "Mario Rossi",
+    vatNumber: "47803200154",
+    taxCode: "RSSMRA91M20B967Q",
+    addressStreet: "Via Italia, 66",
+    addressPostalCode: "20900",
+    addressCity: "Milano",
+    addressProvince: "MI",
+    country: "Italia"
+);
+
+IssuedDocument invoice = new IssuedDocument(
+    type: IssuedDocumentType.Invoice,
+    entity: entity,
+    date: new DateTime(2022, 01, 20),
+    number: 1,
+    numeration: "/fatt",
+    subject: "internal subject",
+    visibleSubject: "visible subject",
+    currency: new Currency(
+        id: "EUR"
+    ),
+    language: new Language(
+        code: "it",
+        name: "italiano"
+    ),
+    itemsList: new List < IssuedDocumentItemsListItem > {
+        new IssuedDocumentItemsListItem(
+            productId: 4,
+            code: "TV3",
+            name: "Tavolo in legno",
+            netPrice: 100,
+            category: "cucina",
+            discount: 0,
+            qty: 1,
+            vat: new VatType(
+                id: 0
+            )
+        )
+    },
+    paymentsList: new List < IssuedDocumentPaymentsListItem > {
+        new IssuedDocumentPaymentsListItem(
+            amount: 122,
+            dueDate: new DateTime(2022, 01, 23),
+            paidDate: new DateTime(2022, 01, 22),
+            status: IssuedDocumentStatus.Paid,
+            paymentAccount: new PaymentAccount(
+                id: 110
+            )
+        )
+    },
+    // Here we add the payment method
+    // List your payment methods: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/InfoApi.md#listpaymentmethods
+    paymentMethod: new PaymentMethod(
+        id: 386683
+    )
+);
+
+8️⃣  Step Eight: Attachment
+
+If you want to attach a file to your invoice you can do it by using Upload Attachment method; the response will include an attachment_token, that you can pass to the Invoice Creation request that we're building to effectively attach the file. The token must be assigned to the attachment_token parameter in the request.
+
+The code to upload an attachment with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+Configuration config = new Configuration();
+config.AccessToken = "YOUR_ACCESS_TOKEN";
+
+var apiInstance = new IssuedDocumentsApi(config);
+
+var filename = "fattura_XX_XXXX";
+var attachment = File.Open("/path/to/file.pdf", FileMode.Open);
+var companyId = 12345;
+
+UploadIssuedDocumentAttachmentResponse result = apiInstance.UploadIssuedDocumentAttachment(companyId, filename, attachment);
+var attachmentToken = result.Data.AttachmentToken;
+
+Retrieve your ACCESS TOKEN!
+
+You can set the Access Token in the dedicated section, for more informations look here.
+9️⃣  Step Nine: Customisation
+
+The customization section allows the choice of the invoice template and is useful to add some details.
+
+    template/delivery_note_template/acc_inv_template: invoice/delivery note/accompanying invoice template, only the id of the template has to be specified, you can retrieve it using the list templates method.
+
+    h_margins/v_margins: horizontal/vertical margins.
+
+    show_payments: if this flag is set to false, the expiration dates of the payments will not be shown on the document.
+
+    show_tspay_button: if this flag is set to true, when the invoice is received by the client it can be paid directly via TS Pay and, without further operations, the invoice will result as paid.
+
+    show_notification_button: if this flag is set to true when the client pays the invoice he can notify the payment by clicking the button.
+
+Here there is our final JSON, complete with the attachment and our favorite invoice template:
+
+// NOTE: this is a complete request, but please customize it before trying to send it!
+
+{
+  "data": {
+    "type": "invoice",
+    "entity": {
+      "id": 1,
+      "name": "Mario Rossi",
+      "vat_number": "47803200154",
+      "tax_code": "RSSMRA91M20B967Q",
+      "address_street": "Via Italia, 66",
+      "address_postal_code": "20900",
+      "address_city": "Milano",
+      "address_province": "MI",
+      "address_extra": "",
+      "country": "Italia"
+    },
+    "date": "2022-01-20",
+    "number": 1,
+    "numeration": "/fatt",
+    "subject": "internal subject",
+    "visible_subject": "visible subject",
+    "currency": {
+      "id": "EUR",
+      "exchange_rate": "1.00000",
+      "symbol": "€"
+    },
+    "language": {
+      "code": "it",
+      "name": "Italiano"
+    },
+    "items_list": [
+      {
+        "product_id": 4,
+        "code": "TV3",
+        "name": "Tavolo in legno",
+        "net_price": 100,
+        "category": "cucina",
+        "discount": 0,
+        "qty": 1,
+        "vat": {
+          "id": 0
+        }
+      }
+    ],
+    "payment_method": {
+      "id": 386683
+    },
+    "payments_list": [
+      {
+        "amount": 122,
+        "due_date": "2022-01-23",
+        "paid_date": "2022-01-22",
+        "status": "paid",
+        "payment_account": {
+          "id": 110
+        }
+      }
+    ],
+    "attachment_token": "YmMyNWYxYzIwMTU3N2Y4ZGE3ZjZiMzg5OWY0ODNkZDQveXl5LmRvYw",
+    "template": {
+      "id": 150
+    }
+  }
+}
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+// NOTE: this is a complete request, but please customize it!!!
+// In the next step we'll explain how to perform the request to the API.
+
+// in this example we are using our C# SDK
+// https://www.nuget.org/packages/It.FattureInCloud.Sdk/
+
+Entity entity = new Entity(
+    id: 1,
+    name: "Mario Rossi",
+    vatNumber: "47803200154",
+    taxCode: "RSSMRA91M20B967Q",
+    addressStreet: "Via Italia, 66",
+    addressPostalCode: "20900",
+    addressCity: "Milano",
+    addressProvince: "MI",
+    country: "Italia"
+);
+
+IssuedDocument invoice = new IssuedDocument(
+    type: IssuedDocumentType.Invoice,
+    entity: entity,
+    date: new DateTime(2022, 01, 20),
+    number: 1,
+    numeration: "/fatt",
+    subject: "internal subject",
+    visibleSubject: "visible subject",
+    currency: new Currency(
+        id: "EUR"
+    ),
+    language: new Language(
+        code: "it",
+        name: "italiano"
+    ),
+    itemsList: new List < IssuedDocumentItemsListItem > {
+        new IssuedDocumentItemsListItem(
+            productId: 4,
+            code: "TV3",
+            name: "Tavolo in legno",
+            netPrice: 100,
+            category: "cucina",
+            discount: 0,
+            qty: 1,
+            vat: new VatType(
+                id: 0
+            )
+        )
+    },
+    paymentsList: new List < IssuedDocumentPaymentsListItem > {
+        new IssuedDocumentPaymentsListItem(
+            amount: 122,
+            dueDate: new DateTime(2022, 01, 23),
+            paidDate: new DateTime(2022, 01, 22),
+            status: IssuedDocumentStatus.Paid,
+            paymentAccount: new PaymentAccount(
+                id: 110
+            )
+        )
+    },
+    paymentMethod: new PaymentMethod(
+        id: 386683
+    ),
+    // Finally we can add the attachment token of our uploaded file and a template
+    // Upload your attachment: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/IssuedDocumentsApi.md#uploadIssuedDocumentAttachment
+    attachmentToken: "YmMyNWYxYzIwMTU3N2Y4ZGE3ZjZiMzg5OWY0ODNkZDQveXl5LmRvYw",
+    // List your templates: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/InfoApi.md#listTemplates
+    template: new DocumentTemplate(
+        id: 150
+    )
+);
+
+✅  Create the document!
+
+Now we are ready to create an invoice, so let's create an invoice using the request we just built:
+
+POST /c/1235/issued_documents HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Host: api-v2.fattureincloud.it
+Content-Length: 900
+
+{"data":{"type":"invoice","entity":{"id":1,"name":"Mario Rossi","vat_number":"47803200154","tax_code":"RSSMRA91M20B967Q","address_street":"Via Italia, 66","address_postal_code":"20900","address_city":"Milano","address_province":"MI","address_extra":"","country":"Italia"},"date":"2022-01-20","number":1,"numeration":"\/fatt","subject":"internal subject","visible_subject":"visible subject","currency":{"id":"EUR","exchange_rate":"1.00000","symbol":"\u20ac"},"language":{"code":"it","name":"Italiano"},"items_list":[{"product_id":4,"code":"TV3","name":"Tavolo in legno","net_price":100,"category":"cucina","discount":0,"qty":1,"vat":{"id":0}}],"payment_method":{"id":386683},"payments_list":[{"amount":122,"due_date":"2022-01-23","paid_date":"2022-01-22","status":"paid","payment_account":{"id":110}}],"attachment_token":"YmMyNWYxYzIwMTU3N2Y4ZGE3ZjZiMzg5OWY0ODNkZDQveXl5LmRvYw","template":{"id":150}}}
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+using System;
+using System.Collections.Generic;
+using It.FattureInCloud.Sdk.Api;
+using It.FattureInCloud.Sdk.Client;
+using It.FattureInCloud.Sdk.Model;
+
+namespace test {
+    class Program {
+        static void Main(string[] args) {
+            Configuration config = new Configuration();
+
+            //set your access token
+            config.AccessToken = "YOUR_ACCESS_TOKEN";
+
+            var apiInstance = new IssuedDocumentsApi(config);
+            //set your company id
+            var companyId = 12345;
+
+            // NOTE: this is a complete request, but please customize it!!!
+            // In the next step we'll explain how to perform the request to the API.
+
+            // in this example we are using our C# SDK
+            // https://www.nuget.org/packages/It.FattureInCloud.Sdk/
+
+            Entity entity = new Entity(
+                id: 1,
+                name: "Mario Rossi",
+                vatNumber: "47803200154",
+                taxCode: "RSSMRA91M20B967Q",
+                addressStreet: "Via Italia, 66",
+                addressPostalCode: "20900",
+                addressCity: "Milano",
+                addressProvince: "MI",
+                country: "Italia"
+            );
+
+            IssuedDocument invoice = new IssuedDocument(
+                type: IssuedDocumentType.Invoice,
+                entity: entity,
+                date: new DateTime(2022, 01, 20),
+                number: 1,
+                numeration: "/fatt",
+                subject: "internal subject",
+                visibleSubject: "visible subject",
+                currency: new Currency(
+                    id: "EUR"
+                ),
+                language: new Language(
+                    code: "it",
+                    name: "italiano"
+                ),
+                itemsList: new List < IssuedDocumentItemsListItem > {
+                    new IssuedDocumentItemsListItem(
+                        productId: 4,
+                        code: "TV3",
+                        name: "Tavolo in legno",
+                        netPrice: 100,
+                        category: "cucina",
+                        discount: 0,
+                        qty: 1,
+                        vat: new VatType(
+                            id: 0
+                        )
+                    )
+                },
+                paymentsList: new List < IssuedDocumentPaymentsListItem > {
+                    new IssuedDocumentPaymentsListItem(
+                        amount: 122,
+                        dueDate: new DateTime(2022, 01, 23),
+                        paidDate: new DateTime(2022, 01, 22),
+                        status: IssuedDocumentStatus.Paid,
+                        paymentAccount: new PaymentAccount(
+                            id: 110
+                        )
+                    )
+                },
+                paymentMethod: new PaymentMethod(
+                    id: 386683
+                ),
+                attachmentToken: "YmMyNWYxYzIwMTU3N2Y4ZGE3ZjZiMzg5OWY0ODNkZDQveXl5LmRvYw",
+                template: new DocumentTemplate(
+                    id: 150
+                )
+            );
+
+            // Here we put our invoice in the request object
+            CreateIssuedDocumentRequest createIssuedDocumentRequest = new CreateIssuedDocumentRequest(
+                data: invoice
+            );
+
+            // Now we are all set for the final call
+            // Create the invoice: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/IssuedDocumentsApi.md#createissueddocument
+            try {
+                CreateIssuedDocumentResponse result = apiInstance.CreateIssuedDocument(companyId, createIssuedDocumentRequest);
+                Console.WriteLine(result);
+            } catch (ApiException e) {
+                Console.WriteLine("Exception when calling IssuedDocumentsApi.CreateIssuedDocument: " + e.Message);
+                Console.WriteLine("Status Code: " + e.ErrorCode);
+                Console.WriteLine(e.StackTrace);
+            }
+        }
+    }
+}
+
+You just created your first invoice. Congratulations!
+📬  Send the document
+
+After you created your invoice it's time to send it to your customer, with the Schedule Email method. To do that you have 2 options:
+
+    use your SMTP server configured in Settings -> SMTP configuration
+    use our mail service setting the sender_id to 0 as shown in the examples below (the mail will result to be sent by no-reply@fattureincloud.it)
+
+In the email body you can use 3 variables:
+
+    {{allegati}}: adds button to download attachments
+    {{logo-1}}: adds the Logo 1 image
+    {{logo-2}}: adds the Logo 2 image
+
+keep in mind that the max size of the body is 50KiB and must be HTML escaped.
+
+POST /c/12345/issued_documents/54321/email HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Host: api-v2.fattureincloud.it
+Content-Length: 900
+
+{ "data": { "sender_id": 0, "recipient_email": "mariorossi@mail.com", "subject": "Nostra fattura nr. 54321", "body": "Gentile xxxxx,<br>per visualizzare la nostra <b>fattura nr. 54321 </b>o per scaricarne una copia in versione PDF prema sul bottone sottostante.<br><br>{{allegati}}<br><br>Cordiali saluti,<br><b>Ino S.p.A</b>", "include": { "document": true, "delivery_note": false, "attachment": false, "accompanying_invoice": false }, "attach_pdf": false, "send_copy": false } }
+
+The corresponding code with our SDKs:
+
+    C#
+    Go
+    Java
+    JavaScript
+    PHP
+    Python
+    Ruby
+    TypeScript
+    Zapier
+
+using System;
+using System.Collections.Generic;
+using It.FattureInCloud.Sdk.Api;
+using It.FattureInCloud.Sdk.Client;
+using It.FattureInCloud.Sdk.Model;
+
+namespace test {
+    class Program {
+        static void Main(string[] args) {
+            Configuration config = new Configuration();
+
+            //set your access token
+            config.AccessToken = "YOUR_ACCESS_TOKEN";
+
+            var apiInstance = new IssuedDocumentsApi(config);
+
+            //set your company id
+            var companyId = 12345;
+
+            //set your previously created document id
+            var documentId = 54321;
+
+            // in this example we are using our C# SDK
+            // https://www.nuget.org/packages/It.FattureInCloud.Sdk/
+
+            EmailSchedule email = new EmailSchedule(
+                senderId: 0,
+                recipientEmail: "mariorossi@mail.com",
+                subject: "Nostra fattura nr. 54321",
+                body: "Gentile xxxxx,<br>per visualizzare la nostra&nbsp;<b>fattura nr. 54321&nbsp;</b>o per scaricarne una copia in versione&nbsp;PDF prema sul bottone sottostante.<br><br>{{allegati}}<br><br>Cordiali saluti,<br><b>Ino S.p.A</b>",
+                include: new EmailScheduleInclude(
+                    document: true,
+                    deliveryNote: false,
+                    attachment: false,
+                    accompanyingInvoice: false
+                    ),
+                attachPdf: false,
+                sendCopy: false
+             );
+
+
+            ScheduleEmailRequest scheduleEmailRequest = new ScheduleEmailRequest(
+                data: email
+            );
+
+            // Now we are all set for the final call
+            // Schedule the email: https://github.com/fattureincloud/fattureincloud-csharp-sdk/blob/master/docs/IssuedDocumentsApi.md#scheduleemail
+            try
+            {
+                apiInstance.ScheduleEmail(companyId, documentId, scheduleEmailRequest);
+            }
+            catch (ApiException e)
+            {
+                Console.WriteLine("Exception when calling IssuedDocumentsApi.ScheduleEmail: " + e.Message);
+                Console.WriteLine("Status Code: " + e.ErrorCode);
+                Console.WriteLine(e.StackTrace);
+            }
+        }
+    }
+}
