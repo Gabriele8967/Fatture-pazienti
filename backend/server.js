@@ -38,6 +38,18 @@ function isValidEmail(email) {
   return regex.test(email);
 }
 
+// Validazione CAP italiano
+function isValidCAP(cap) {
+  const regex = /^[0-9]{5}$/;
+  return regex.test(cap);
+}
+
+// Validazione provincia italiana
+function isValidProvincia(provincia) {
+  const regex = /^[A-Z]{2}$/i;
+  return regex.test(provincia);
+}
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server attivo' });
@@ -81,10 +93,10 @@ app.get('/api/payment-methods', async (req, res) => {
 // Endpoint per creare la fattura
 app.post('/api/create-invoice', async (req, res) => {
   try {
-    const { firstName, lastName, email, codiceFiscale, causale, prezzo, metodoPagamentoId } = req.body;
+    const { firstName, lastName, email, codiceFiscale, indirizzo, cap, citta, provincia, causale, prezzo, metodoPagamentoId } = req.body;
 
     // Validazione input
-    if (!firstName || !lastName || !email || !codiceFiscale || !causale || !prezzo || !metodoPagamentoId) {
+    if (!firstName || !lastName || !email || !codiceFiscale || !indirizzo || !cap || !citta || !provincia || !causale || !prezzo || !metodoPagamentoId) {
       return res.status(400).json({
         success: false,
         message: 'Tutti i campi sono obbligatori'
@@ -102,6 +114,34 @@ app.post('/api/create-invoice', async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Codice fiscale non valido'
+      });
+    }
+
+    if (!isValidCAP(cap)) {
+      return res.status(400).json({
+        success: false,
+        message: 'CAP non valido (deve essere di 5 cifre)'
+      });
+    }
+
+    if (!isValidProvincia(provincia)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Provincia non valida (deve essere di 2 lettere)'
+      });
+    }
+
+    if (indirizzo.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'L\'indirizzo deve contenere almeno 3 caratteri'
+      });
+    }
+
+    if (citta.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'La città deve contenere almeno 2 caratteri'
       });
     }
 
@@ -148,6 +188,10 @@ app.post('/api/create-invoice', async (req, res) => {
           last_name: lastName,
           email: email,
           tax_code: codiceFiscale.toUpperCase(),
+          address_street: indirizzo,
+          address_postal_code: cap,
+          address_city: citta,
+          address_province: provincia.toUpperCase(),
           country: 'Italia'
         },
         date: new Date().toISOString().split('T')[0],
