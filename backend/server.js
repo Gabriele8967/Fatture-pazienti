@@ -93,13 +93,29 @@ app.get('/api/payment-methods', async (req, res) => {
 // Endpoint per creare la fattura
 app.post('/api/create-invoice', async (req, res) => {
   try {
-    const { firstName, lastName, email, codiceFiscale, indirizzo, cap, citta, provincia, causale, prezzo, metodoPagamentoId } = req.body;
+
+    // Dicitura imposta di bollo
+    const bolloText = "Imposta di bollo assolta in modo virtuale - autorizzazione dell'Ag. delle Entrate, Dir. Prov. II. di Roma Aut. n. 28/2025 del 29/5/2025 ai sensi art.15 del D.P.R. n° 642/72 e succ. modif. e integraz.";
+    
+        const { 
+    firstName, lastName, email, codiceFiscale, indirizzo, cap, citta, provincia, 
+    telefono, dataNascita, luogoNascita, professione, numeroDocumento, scadenzaDocumento, 
+    emailComunicazioni, note, causale, prezzo, metodoPagamentoId 
+} = req.body;
 
     // Validazione input
     if (!firstName || !lastName || !email || !codiceFiscale || !indirizzo || !cap || !citta || !provincia || !causale || !prezzo || !metodoPagamentoId) {
       return res.status(400).json({
         success: false,
         message: 'Tutti i campi sono obbligatori'
+      });
+    }
+
+    // Validazione campi aggiuntivi obbligatori
+    if (!telefono || !dataNascita || !luogoNascita) {
+      return res.status(400).json({
+        success: false,
+        message: 'Telefono, data di nascita e luogo di nascita sono obbligatori'
       });
     }
 
@@ -186,13 +202,22 @@ app.post('/api/create-invoice', async (req, res) => {
           name: `${firstName} ${lastName}`,
           first_name: firstName,
           last_name: lastName,
-          email: email,
+          email: email || emailComunicazioni,
           tax_code: codiceFiscale.toUpperCase(),
           address_street: indirizzo,
           address_postal_code: cap,
           address_city: citta,
           address_province: provincia.toUpperCase(),
-          country: 'Italia'
+          country: 'Italia',
+          // Dettagli aggiuntivi paziente
+          phone: telefono,
+          birth_date: dataNascita,
+          birth_place: luogoNascita,
+          job_title: professione,
+          // Note aggiuntive nel campo notes
+          notes: `Documento: ${numeroDocumento || 'N/A'}, Scadenza: ${scadenzaDocumento || 'N/A'}${note ? ', Note: ' + note : ''}
+
+${bolloText}`
         },
         date: new Date().toISOString().split('T')[0],
         currency: {
@@ -207,7 +232,22 @@ app.post('/api/create-invoice', async (req, res) => {
             name: causale,
             qty: 1,
             net_price: netAmount,
-            not_taxable: true
+            // IMPORTANTE: usa vat con ID esente invece di not_taxable per mostrare importo corretto
+            vat: {
+              id: parseInt(process.env.FIC_EXEMPT_VAT_ID) || 6, // ID aliquota esente
+              value: 0,
+              description: 'Esente art.10'
+            }
+          },
+          {
+            name: 'Imposta di Bollo',
+            qty: 1,
+            net_price: 0,
+            vat: {
+              id: parseInt(process.env.FIC_EXEMPT_VAT_ID) || 6,
+              value: 0,
+              description: 'Esente art.10'
+            }
           }
         ] : [
           {

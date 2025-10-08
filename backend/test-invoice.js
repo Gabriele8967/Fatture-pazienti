@@ -19,17 +19,42 @@ async function testInvoiceCreation() {
           last_name: 'Testoni',
           email: 'marco.test@example.com',
           tax_code: 'TSTMRC90M01H501Z',
-          country: 'Italia'
+          address_street: 'Via Roma 123',
+          address_postal_code: '00100',
+          address_city: 'Roma',
+          address_province: 'RM',
+          country: 'Italia',
+          phone: '+39 123 456 7890',
+          birth_date: '1990-01-01',
+          birth_place: 'Roma',
+          job_title: 'Ingegnere',
+          notes: 'Documento: AB1234567, Scadenza: 2030-01-01, Note: Test completo paziente'
         },
         date: new Date().toISOString().split('T')[0],
         currency: { id: 'EUR' },
         language: { code: 'it', name: 'Italiano' },
-        items_list: [{
-          name: 'Visita test',
-          qty: 1,
-          net_price: 100.00,
-          not_taxable: true
-        }],
+        items_list: [
+          {
+            name: 'Imposta di Bollo',
+            qty: 1,
+            net_price: 0,
+            vat: {
+              id: 6,
+              value: 0,
+              description: 'Esente art.10'
+            }
+          },
+          {
+            name: 'Visita test',
+            qty: 1,
+            net_price: 100.00,
+            vat: {
+              id: 6,
+              value: 0,
+              description: 'Esente art.10'
+            }
+          }
+        ],
         payments_list: [{
           amount: 100.00,
           due_date: new Date().toISOString().split('T')[0],
@@ -101,7 +126,6 @@ async function testInvoiceCreation() {
     const invoice = getResponse.data.data;
     console.log('\n📋 Dati fattura:');
     console.log(`   Nome: ${invoice.entity.name}`);
-    console.log(`   Nome: ${invoice.entity.first_name} ${invoice.entity.last_name}`);
     console.log(`   Email: ${invoice.entity.email}`);
     console.log(`   Codice Fiscale: ${invoice.entity.tax_code}`);
     console.log(`   Stato pagamento: ${invoice.payments_list[0].status}`);
