@@ -142,6 +142,7 @@ app.post('/api/create-invoice', async (req, res) => {
       data: {
         type: 'invoice',
         entity: {
+          type: 'person',
           name: `${firstName} ${lastName}`,
           first_name: firstName,
           last_name: lastName,
