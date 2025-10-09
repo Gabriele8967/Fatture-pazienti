@@ -303,49 +303,43 @@
 </head>
 <body>
     <div class="container">
-        <h1>Richiesta Fattura</h1>
-        <p class="subtitle">Inserisci i tuoi dati per ricevere la fattura</p>
+        <h1>📋 Richiesta Fattura</h1>
+        <p class="subtitle">Compila il modulo per ricevere la tua fattura via email</p>
 
         <div class="info-box">
-            <strong>Informazione:</strong> Compila tutti i campi con i tuoi dati. La fattura verrà generata automaticamente.
+            <strong>ℹ️ Come funziona:</strong> Inserisci i tuoi dati nei campi qui sotto. Una volta completato, clicca su "Genera Fattura" e riceverai la fattura direttamente nella tua email! I campi con * sono obbligatori.
         </div>
 
         <form id="invoiceForm">
+            <!-- Sezione Dati Personali -->
+            <h3 style="color: #667eea; font-size: 18px; margin: 32px 0 20px 0; font-weight: 600;">👤 Dati Personali</h3>
+
             <div class="form-group">
-                <label for="firstName">Nome *</label>
+                <label for="firstName">📝 Nome *</label>
                 <input
                     type="text"
                     id="firstName"
                     name="firstName"
-                    placeholder="Mario"
+                    placeholder="Es: Mario"
                     required
+                    aria-label="Nome"
                 >
             </div>
 
             <div class="form-group">
-                <label for="lastName">Cognome *</label>
+                <label for="lastName">📝 Cognome *</label>
                 <input
                     type="text"
                     id="lastName"
                     name="lastName"
-                    placeholder="Rossi"
+                    placeholder="Es: Rossi"
                     required
+                    aria-label="Cognome"
                 >
             </div>
 
             <div class="form-group">
-                <label for="email">Email *</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="mario.rossi@email.it"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="codiceFiscale">Codice Fiscale *</label>
+                <label for="codiceFiscale">🆔 Codice Fiscale *</label>
                 <input
                     type="text"
                     id="codiceFiscale"
@@ -354,46 +348,91 @@
                     maxlength="16"
                     style="text-transform: uppercase"
                     required
+                    aria-label="Codice Fiscale"
+                >
+                <small style="color: #6b7280; font-size: 13px; display: block; margin-top: 6px;">Inserisci il tuo codice fiscale di 16 caratteri</small>
+            </div>
+
+            <div class="form-group">
+                <label for="dataNascita">🎂 Data di Nascita *</label>
+                <input
+                    type="date"
+                    id="dataNascita"
+                    name="dataNascita"
+                    required
+                    aria-label="Data di Nascita"
                 >
             </div>
 
             <div class="form-group">
-                <label for="indirizzo">Indirizzo *</label>
+                <label for="luogoNascita">🏛️ Luogo di Nascita *</label>
+                <input
+                    type="text"
+                    id="luogoNascita"
+                    name="luogoNascita"
+                    placeholder="Es: Roma"
+                    required
+                    aria-label="Luogo di Nascita"
+                >
+            </div>
+
+            <!-- Sezione Contatti -->
+            <h3 style="color: #667eea; font-size: 18px; margin: 32px 0 20px 0; font-weight: 600;">📞 Contatti</h3>
+
+            <div class="form-group">
+                <label for="email">📧 Email *</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="mario.rossi@email.it"
+                    required
+                    aria-label="Email"
+                >
+                <small style="color: #6b7280; font-size: 13px; display: block; margin-top: 6px;">La fattura sarà inviata a questo indirizzo email</small>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">📱 Telefono *</label>
+                <input
+                    type="tel"
+                    id="telefono"
+                    name="telefono"
+                    placeholder="333 1234567"
+                    required
+                    aria-label="Telefono"
+                >
+            </div>
+
+            <!-- Sezione Indirizzo -->
+            <h3 style="color: #667eea; font-size: 18px; margin: 32px 0 20px 0; font-weight: 600;">🏠 Indirizzo</h3>
+
+            <div class="form-group">
+                <label for="indirizzo">📍 Via/Piazza e Numero Civico *</label>
                 <input
                     type="text"
                     id="indirizzo"
                     name="indirizzo"
-                    placeholder="Via Roma, 123"
+                    placeholder="Es: Via Roma, 123"
                     required
+                    aria-label="Indirizzo"
                 >
             </div>
 
             <div class="form-group">
-                <label for="cap">CAP *</label>
-                <input
-                    type="text"
-                    id="cap"
-                    name="cap"
-                    placeholder="00100"
-                    maxlength="5"
-                    pattern="[0-9]{5}"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="citta">Città *</label>
+                <label for="citta">🏙️ Città *</label>
                 <input
                     type="text"
                     id="citta"
                     name="citta"
-                    placeholder="Roma"
+                    placeholder="Es: Roma"
                     required
+                    aria-label="Città"
                 >
             </div>
 
             <div class="form-group">
-                <label for="provincia">Provincia *</label>
+                <label for="provincia">🗺️ Provincia (Sigla) *</label>
                 <input
                     type="text"
                     id="provincia"
@@ -402,94 +441,44 @@
                     maxlength="2"
                     style="text-transform: uppercase"
                     required
+                    aria-label="Provincia"
                 >
-            </div>
-            <div class="form-group">
-                <label for="telefono">Telefono *</label>
-                <input
-                    type="tel"
-                    id="telefono"
-                    name="telefono"
-                    placeholder="+39 123 456 7890"
-                    required
-                >
+                <small style="color: #6b7280; font-size: 13px; display: block; margin-top: 6px;">Inserisci solo le 2 lettere (es: RM, MI, NA)</small>
             </div>
 
             <div class="form-group">
-                <label for="dataNascita">Data di Nascita *</label>
-                <input
-                    type="date"
-                    id="dataNascita"
-                    name="dataNascita"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="luogoNascita">Luogo di Nascita *</label>
+                <label for="cap">📮 CAP *</label>
                 <input
                     type="text"
-                    id="luogoNascita"
-                    name="luogoNascita"
-                    placeholder="Roma"
+                    id="cap"
+                    name="cap"
+                    placeholder="00100"
+                    maxlength="5"
+                    pattern="[0-9]{5}"
                     required
+                    aria-label="CAP"
                 >
+                <small style="color: #6b7280; font-size: 13px; display: block; margin-top: 6px;">Codice di 5 cifre (es: 00100)</small>
             </div>
 
-            <div class="form-group">
-                <label for="professione">Professione</label>
-                <input
-                    type="text"
-                    id="professione"
-                    name="professione"
-                    placeholder="Ingegnere, Medico, etc."
-                >
-            </div>
+            <!-- Sezione Dati Fattura -->
+            <h3 style="color: #667eea; font-size: 18px; margin: 32px 0 20px 0; font-weight: 600;">💳 Dati Fattura</h3>
 
             <div class="form-group">
-                <label for="numeroDocumento">Numero Documento</label>
-                <input
-                    type="text"
-                    id="numeroDocumento"
-                    name="numeroDocumento"
-                    placeholder="AB1234567"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="scadenzaDocumento">Scadenza Documento</label>
-                <input
-                    type="date"
-                    id="scadenzaDocumento"
-                    name="scadenzaDocumento"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="emailComunicazioni">Email per Comunicazioni</label>
-                <input
-                    type="email"
-                    id="emailComunicazioni"
-                    name="emailComunicazioni"
-                    placeholder="comunicazioni@email.it"
-                >
-            </div>
-
-
-
-            <div class="form-group">
-                <label for="causale">Causale / Descrizione Prestazione *</label>
+                <label for="causale">📄 Descrizione Prestazione *</label>
                 <input
                     type="text"
                     id="causale"
                     name="causale"
-                    placeholder="Es: Visita medica, Consulenza, Prestazione sanitaria..."
+                    placeholder="Es: Visita medica specialistica"
                     required
+                    aria-label="Causale"
                 >
+                <small style="color: #6b7280; font-size: 13px; display: block; margin-top: 6px;">Descrivi brevemente la prestazione ricevuta</small>
             </div>
 
             <div class="form-group">
-                <label for="prezzo">Prezzo (€) *</label>
+                <label for="prezzo">💰 Importo (€) *</label>
                 <input
                     type="number"
                     id="prezzo"
@@ -498,26 +487,79 @@
                     step="0.01"
                     min="0.01"
                     required
+                    aria-label="Prezzo"
                 >
+                <small style="color: #6b7280; font-size: 13px; display: block; margin-top: 6px;">L'importo pagato per la prestazione</small>
             </div>
 
             <div class="form-group">
-                <label for="metodoPagamento">Metodo di Pagamento *</label>
+                <label for="metodoPagamento">💳 Come hai pagato? *</label>
                 <select
                     id="metodoPagamento"
                     name="metodoPagamento"
                     required
+                    aria-label="Metodo di Pagamento"
                 >
-                    <option value="">Caricamento...</option>
+                    <option value="">Caricamento metodi...</option>
                 </select>
             </div>
 
+            <!-- Sezione Opzionale (nascosta di default) -->
+            <details style="margin-top: 24px; padding: 16px; background: rgba(102, 126, 234, 0.03); border-radius: 12px;">
+                <summary style="cursor: pointer; font-weight: 600; color: #667eea; user-select: none;">📋 Dati Aggiuntivi (opzionali)</summary>
+
+                <div style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label for="professione">💼 Professione</label>
+                        <input
+                            type="text"
+                            id="professione"
+                            name="professione"
+                            placeholder="Es: Ingegnere, Medico, Impiegato..."
+                            aria-label="Professione"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numeroDocumento">🪪 Numero Documento d'Identità</label>
+                        <input
+                            type="text"
+                            id="numeroDocumento"
+                            name="numeroDocumento"
+                            placeholder="AB1234567"
+                            aria-label="Numero Documento"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scadenzaDocumento">📅 Scadenza Documento</label>
+                        <input
+                            type="date"
+                            id="scadenzaDocumento"
+                            name="scadenzaDocumento"
+                            aria-label="Scadenza Documento"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emailComunicazioni">📨 Email Alternativa per Comunicazioni</label>
+                        <input
+                            type="email"
+                            id="emailComunicazioni"
+                            name="emailComunicazioni"
+                            placeholder="comunicazioni@email.it"
+                            aria-label="Email Comunicazioni"
+                        >
+                    </div>
+                </div>
+            </details>
+
             <button type="submit" id="submitBtn">
-                Genera Fattura
+                ✅ Genera e Invia Fattura
             </button>
 
             <div class="loading" id="loading" style="display: none;">
-                Creazione fattura in corso...
+                ⏳ Generazione fattura in corso... Attendere prego
             </div>
         </form>
 
@@ -672,14 +714,16 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage(`Fattura creata con successo! Numero: ${data.invoice.number}`, 'success');
+                    showMessage(`✅ Perfetto! La tua fattura n. ${data.invoice.number} è stata creata e inviata alla tua email. Controlla la tua casella di posta!`, 'success');
                     form.reset();
+                    // Ricarica i metodi di pagamento dopo il reset
+                    setTimeout(() => loadPaymentMethods(), 500);
                 } else {
-                    showMessage(data.message || 'Errore nella creazione della fattura', 'error');
+                    showMessage(`❌ ${data.message || 'Si è verificato un errore. Riprova o contatta l\'assistenza.'}`, 'error');
                 }
             } catch (error) {
                 console.error('Errore:', error);
-                showMessage('Errore di connessione al server. Riprova più tardi.', 'error');
+                showMessage('❌ Errore di connessione. Verifica la tua connessione internet e riprova.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 loading.style.display = 'none';

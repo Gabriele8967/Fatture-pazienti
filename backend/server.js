@@ -191,7 +191,10 @@ app.post('/api/create-invoice', async (req, res) => {
     const netAmount = prezzoNumerico;
     const vatRate = parseFloat(process.env.VAT_RATE) || 0; // Prestazioni sanitarie esenti IVA
     const vatAmount = (netAmount * vatRate) / 100;
-    const grossAmount = netAmount + vatAmount;
+
+    // Calcolo marca da bollo (€2,00 se fattura esente IVA > €77,47)
+    const stampDuty = (vatRate === 0 && netAmount > 77.47) ? 2.00 : 0;
+    const grossAmount = netAmount + vatAmount + stampDuty;
 
     // Preparazione dati per Fatture in Cloud
     const invoiceData = {
@@ -214,10 +217,17 @@ app.post('/api/create-invoice', async (req, res) => {
           birth_date: dataNascita,
           birth_place: luogoNascita,
           job_title: professione,
+          // Configurazione fattura elettronica
+          e_invoice: true,
+          ei_code: '0000000', // Codice per privati/consumatori finali
           // Note aggiuntive nel campo notes
           notes: `Documento: ${numeroDocumento || 'N/A'}, Scadenza: ${scadenzaDocumento || 'N/A'}
 
 ${bolloText}`
+        },
+        e_invoice: true,
+        ei_data: {
+          payment_method: 'MP05' // Bonifico bancario come codice standard
         },
         date: new Date().toISOString().split('T')[0],
         currency: {
@@ -240,9 +250,9 @@ ${bolloText}`
             }
           },
           {
-            name: 'Imposta di Bollo',
+            name: 'Marca da Bollo',
             qty: 1,
-            net_price: 0,
+            net_price: stampDuty,
             vat: {
               id: parseInt(process.env.FIC_EXEMPT_VAT_ID) || 6,
               value: 0,
@@ -261,20 +271,16 @@ ${bolloText}`
             }
           }
         ],
+        payment_method: {
+          id: parseInt(metodoPagamentoId)
+        },
         payments_list: [
           {
             amount: grossAmount,
             due_date: new Date().toISOString().split('T')[0],
-            paid_date: new Date().toISOString().split('T')[0],
-            status: 'paid',
-            payment_account: {
-              id: 1415813  // Account "altro" per fatture saldate
-            }
+            status: 'not_paid'
           }
         ],
-        payment_method: {
-          id: parseInt(metodoPagamentoId)
-        },
         show_payment_method: true
       }
     };
